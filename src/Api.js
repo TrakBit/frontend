@@ -8,7 +8,17 @@ const defaultAxiosOptions = {
 
 export const fetch = axios.create(defaultAxiosOptions);
 
-export const getItems = async () => {
-    const response = await fetch.get('pagesize=30&order=desc&sort=votes&site=stackoverflow');
+export const getItems = async (fromDate, toDate, pageSize, page) => {
+    const response = await fetch.get(null, {
+      params: {
+        pageSize,
+        fromDate,
+        toDate,
+        page,
+        order: 'desc',
+        sort: 'votes',
+        site: 'stackoverflow'
+      }
+    });
     return response.data;
 };

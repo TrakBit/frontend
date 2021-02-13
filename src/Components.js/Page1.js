@@ -1,9 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import {ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import {DatePicker, Row, Col, Button, InputNumber} from 'antd';
+import moment from 'moment'
 import '../App.css';
 import Header from './Header'
 import {getItems} from '../Api';
+
+const {RangePicker} =  DatePicker
 
 const Container = styled.section`
   display: flex;
@@ -16,30 +20,38 @@ const Container = styled.section`
 function Page1() {
   const [screenWidth, setScreenWidth] = useState('50%');
   const [tags, setTags] = useState([]);
+  const [fromDate, setFromDate] = useState(moment().subtract(15,'days').unix())
+  const [toDate, setToDate] = useState(moment().add(5,'days').unix())
+  const [pageSize, setPageSize] = useState(30)
+  const [page, setPage] = useState(1)
 
+  const getItemsData = async() => {
+    const tagsData = [];
+    const itemsData = await getItems(fromDate, toDate, pageSize, page);
+    itemsData.items.forEach(item => {
+      item.tags.forEach(tag => {
+        const foundTag = tagsData.find(element => element.name === tag)
+        if (typeof foundTag !== "undefined") {
+          foundTag.count = foundTag.count + 1
+        } else {
+          tagsData.push({name: tag, count: 1})
+        }
+      })
+    });
+    setTags(tagsData)
+  }
 
   useEffect(() => {
-    const getItemsData = async() => {
-      const tagsData = [];
-      const itemsData = await getItems();
-      itemsData.items.forEach(item => {
-        item.tags.forEach(tag => {
-          const foundTag = tagsData.find(element => element.name === tag)
-          if (typeof foundTag !== "undefined") {
-            foundTag.count = foundTag.count + 1
-          } else {
-            tagsData.push({name: tag, count: 1})
-          }
-        })
-      });
-      setTags(tagsData)
-    }
     if (window.innerWidth < 480) {
         setScreenWidth('100%');
     }
     getItemsData()
   },[])
 
+  const setValue = (val) => {
+    setFromDate(val[0].unix())
+    setToDate(val[1].unix())
+  }
 
   return (
     <div className="App">
@@ -65,8 +77,51 @@ function Page1() {
               <Bar dataKey="count" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>
+          <Row>
+            <Col span={6}>
+              {'Date:'}
+            </Col>
+            <Col span={18}>
+            <RangePicker
+              onChange={val => setValue(val)}
+              value={moment.unix(toDate)}
+            />
+            </Col>
+          </Row>
+          <br/>
+          <Row>
+            <Col span={11}>
+              {'Page Size:'}
+            </Col>
+            <Col span={13}>
+              <InputNumber 
+                type={'number'}
+                min={1}
+                value={pageSize}
+                onChange={(number) => setPageSize(number)}
+              />
+            </Col>
+          </Row>
+          <br/>
+          <Row>
+            <Col span={11}>
+              {'Page:'}
+            </Col>
+            <Col span={13}>
+              <InputNumber 
+                type={'number'}
+                min={1}
+                value={page}
+                onChange={(number) => setPage(number)}
+              />
+            </Col>
+          </Row>
+          <br/>
+          <Button onClick={() => getItemsData()}>
+            Filter
+          </Button>
         </Container>
-      <div>Page 1</div>
+
     </div>
   );
 }

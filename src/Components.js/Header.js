@@ -1,40 +1,35 @@
 import '../App.css';
-import styled from 'styled-components';
 import {Link} from "react-router-dom";
-
-const NavButton = styled.button`
-    background-color: white;
-    border-width: 6px;
-    color: #000000;
-    font-size: 25px;
-`;
+import 'antd/dist/antd.css';
+import {Button} from 'antd';
+import { Row, Col } from 'antd';
 
 const Header = () => (
   <header>
     <div className='wrapper'>
-        <section className='columns'>
-            <div className='column'>
+        <Row>
+            <Col span={8}>
                 <Link to={'/page1'}>
-                    <NavButton>
+                    <Button>
                         {'Page 1'}
-                    </NavButton>
+                    </Button>
                 </Link>
-            </div>
-            <div className='column'>
+            </Col>
+            <Col span={8}>
                 <Link to={'/page2'}>
-                    <NavButton>
+                    <Button>
                         {'Page 2'}
-                    </NavButton>
+                    </Button>
                 </Link>
-            </div>
-            <div className='column'>
+            </Col>
+            <Col span={8}>
                 <Link to={'/page3'}>
-                    <NavButton>
+                    <Button>
                         {'Page 3'}
-                    </NavButton>
+                    </Button>
                 </Link>
-            </div>
-        </section>
+            </Col>
+        </Row>
     </div>
   </header>
 );
