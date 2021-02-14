@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import {ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
-import {DatePicker, Row, Col, Button, InputNumber} from 'antd';
+import {DatePicker, Row, Button, InputNumber} from 'antd';
 import moment from 'moment';
 import '../App.css';
 import Header from './Header';
@@ -12,6 +12,13 @@ const {RangePicker} = DatePicker;
 const Container = styled.section`
   display: flex;
   flex-direction: column;
+  align-items: center;
+  word-wrap: break-word;
+`;
+
+const RowContainer = styled.section`
+  display: flex;
+  flex-direction: row;
   align-items: center;
   word-wrap: break-word;
 `;
@@ -100,42 +107,36 @@ const Filters = ({setValue, pageSize, setPageSize, page, setPage, getItemsData})
     return (
         <>
             <Row>
-                <Col span={8}>
+                <RowContainer>
                     {'Date:'}
-                </Col>
-                <Col span={16}>
                     <RangePicker
                         onChange={(val) => setValue(val)}
                     />
-                </Col>
+                </RowContainer>
             </Row>
             <br/>
             <Row>
-                <Col span={8}>
+                <RowContainer>
                     {'Page Size:'}
-                </Col>
-                <Col span={16}>
                     <InputNumber
                         type={'number'}
                         min={1}
                         value={pageSize}
                         onChange={(number) => setPageSize(number)}
                     />
-                </Col>
+                </RowContainer>
             </Row>
             <br/>
             <Row>
-                <Col span={8}>
+                <RowContainer>
                     {'Page:'}
-                </Col>
-                <Col span={16}>
                     <InputNumber
                         type={'number'}
                         min={1}
                         value={page}
                         onChange={(number) => setPage(number)}
                     />
-                </Col>
+                </RowContainer>
             </Row>
             <br/>
             <Button onClick={() => getItemsData()}>
