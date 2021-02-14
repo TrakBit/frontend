@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useHistory} from 'react-router-dom';
+import {useHistory, useLocation} from 'react-router-dom';
 import '../App.css';
 import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
@@ -22,10 +22,11 @@ const RowContainer = styled.section`
 
 function Page2() {
     const history = useHistory();
+    const location = useLocation();
     const [value, setValue] = useState('hello');
 
     useEffect(() => {
-        history.push(`./page2?q=${value}`);
+        history.push(`${location.pathname}?q=${value}`);
     }, [value]);
 
     return (
