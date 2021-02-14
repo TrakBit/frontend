@@ -1,6 +1,5 @@
-/* eslint-disable */
 import {Button} from 'antd';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Webcam from 'react-webcam';
 import styled from 'styled-components';
 import Cropper from 'react-easy-crop';
@@ -26,13 +25,6 @@ const ModalContainer = styled(FlexCol)`
   justify-content: space-between;
 `;
 
-const RowContainer = styled.section`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  word-wrap: break-word;
-`;
-
 const videoConstraints = {
     width: 1280,
     height: 720,
@@ -50,41 +42,42 @@ const customStyles = {
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
         borderRadius: '0.25rem',
-        backgroundColor:  '#FFFFFF',
+        backgroundColor: '#FFFFFF',
         boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)'
     }
 };
 
 function Page3() {
     const webcamRef = React.useRef(null);
-    const [image, setImage] = useState(null)
-    const [cropModal, setCropModal] = useState(false)
-    const [zoom, setZoom] = useState(1)
-    const [croppedAreaPixels, setCroppedAreaPixel] = useState({})
+    const [image, setImage] = useState(null);
+    const [cropModal, setCropModal] = useState(false);
+    const [zoom, setZoom] = useState(1);
+    const [croppedArea, setCroppedAreaPixel] = useState({});
     const [crop, setCrop] = useState({
         x: 0,
         y: 0
-    })
+    });
 
     const capture = React.useCallback(
         () => {
-            const image = webcamRef.current.getScreenshot();
-            setImage(image)
-            setCropModal(true)
+            const croppedImage = webcamRef.current.getScreenshot();
+            setImage(croppedImage);
+            setCropModal(true);
         },
         [webcamRef]
     );
 
     const onCropComplete = (_, croppedAreaPixels) => {
-        setCroppedAreaPixel(croppedAreaPixels)
-    }
+        setCroppedAreaPixel(croppedAreaPixels);
+    };
 
     const setCroppedImage = async () => {
         if (image) {
-            const croppedImage = await getCroppedImg(image, croppedAreaPixels)
-            setImage(croppedImage)
+            const croppedImage = await getCroppedImg(image, croppedArea);
+            setImage(croppedImage);
+            setCropModal(false);
         }
-    }
+    };
 
     return (
         <div className='App'>
@@ -99,13 +92,13 @@ function Page3() {
                     videoConstraints={videoConstraints}
                 />
             </Container>
-            
+
             <Container>
-                <Button 
+                <Button
                     onClick={capture}
                     type='primary'
                 >
-                        Capture photo
+                    Capture photo
                 </Button>
             </Container>
 
@@ -126,7 +119,7 @@ function Page3() {
                         onZoomChange={setZoom}
                         onCropComplete={onCropComplete}
                     />
-                    <Button 
+                    <Button
                         onClick={setCroppedImage}
                         type='primary'
                     >
@@ -136,10 +129,10 @@ function Page3() {
             </Dialog>
             <Container>
                 <div style={{height: 360, width: 420}}>
-                    <img 
+                    <img
                         style={{
                             marginTop: 40
-                        }} 
+                        }}
                         src={image}
                     />
                 </div>
@@ -149,48 +142,47 @@ function Page3() {
     );
 }
 
-const createImage = url =>
-  new Promise((resolve, reject) => {
-    const image = new Image()
-    image.addEventListener('load', () => resolve(image))
-    image.addEventListener('error', error => reject(error))
-    image.setAttribute('crossOrigin', 'anonymous') // needed to avoid cross-origin issues on CodeSandbox
-    image.src = url
-  })
+const createImage = (url) =>
+    new Promise((resolve, reject) => {
+        const image = new Image();
+        image.addEventListener('load', () => resolve(image));
+        image.addEventListener('error', (error) => reject(error));
+        image.setAttribute('crossOrigin', 'anonymous');
+        image.src = url;
+    });
 
 const getCroppedImg = async (imageSrc, pixelCrop) => {
-    const image = await createImage(imageSrc)
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-  
-    const maxSize = Math.max(image.width, image.height)
-    const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2))
+    const image = await createImage(imageSrc);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
 
-    canvas.width = safeArea
-    canvas.height = safeArea
+    const maxSize = Math.max(image.width, image.height);
+    const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
+
+    canvas.width = safeArea;
+    canvas.height = safeArea;
 
     ctx.drawImage(
-      image,
-      safeArea / 2 - image.width * 0.5,
-      safeArea / 2 - image.height * 0.5
-    )
-    const data = ctx.getImageData(0, 0, safeArea, safeArea)
+        image,
+        (safeArea / 2) - (image.width * 0.5),
+        (safeArea / 2) - (image.height * 0.5)
+    );
+    const data = ctx.getImageData(0, 0, safeArea, safeArea);
 
-    canvas.width = pixelCrop.width
-    canvas.height = pixelCrop.height
-  
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
+
     ctx.putImageData(
-      data,
-      Math.round(0 - safeArea / 2 + image.width * 0.5 - pixelCrop.x),
-      Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
-    )
+        data,
+        Math.round(0 - safeArea / 2 + image.width * 0.5 - pixelCrop.x),
+        Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
+    );
 
-    return new Promise(resolve => {
-      canvas.toBlob(file => {
-        resolve(URL.createObjectURL(file))
-      }, 'image/jpeg')
-    })
-  }
-  
+    return new Promise((resolve) => {
+        canvas.toBlob((file) => {
+            resolve(URL.createObjectURL(file));
+        }, 'image/jpeg');
+    });
+};
 
 export default Page3;
